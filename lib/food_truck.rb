@@ -10,23 +10,24 @@ class FoodTruck
   end
 
   def check_stock(item)
-    stock = 0
-    if @stock_qty[item].nil?
-      count = 0
-    else
-      count += item
-    end
+    # @stock_qty.each do |item, quantity|
+      if @stock_qty[item].nil?
+        @stock_qty[item] = 0
+      else
+        @stock_qty[item] += @inventory[item]
+      end
+    # end
+    binding.pry
   end
 
   def stock(item, quantity)
-    @stock_qty.each do |item, quantity|
+    @inventory.each do |item, quantity|
       if @inventory[item].nil?
         @inventory[item] = quantity
       else
         @inventory[item] += quantity
       end
     end
-binding.pry
-    @stock_qty
+    @inventory
   end
 end
