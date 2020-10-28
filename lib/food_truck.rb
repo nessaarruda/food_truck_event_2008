@@ -1,33 +1,27 @@
 class FoodTruck
-  attr_reader :name,
-              :inventory,
-              :stock_qty
+
+  attr_reader :name, :inventory
 
   def initialize(name)
     @name = name
     @inventory = {}
-    @stock_qty = {}
+    @count_items = 0
   end
 
   def check_stock(item)
-    # @stock_qty.each do |item, quantity|
-      if @stock_qty[item].nil?
-        @stock_qty[item] = 0
-      else
-        @stock_qty[item] += @inventory[item]
-      end
-    # end
-    binding.pry
+    @count_items
   end
 
-  def stock(item, quantity)
-    @inventory.each do |item, quantity|
-      if @inventory[item].nil?
-        @inventory[item] = quantity
-      else
-        @inventory[item] += quantity
+  def stock(item,num)
+    @inventory[item] = num
+    @count_items += num
+  end
+
+  def potential_revenue
+      total = 0
+      inventory.keys.each do |item|
+        total += (item.price * inventory[item])
       end
-    end
-    @inventory
+      total
   end
 end
