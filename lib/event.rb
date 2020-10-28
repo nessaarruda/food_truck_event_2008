@@ -41,7 +41,6 @@ class Event
     total = 0
     @food_trucks.each do |food_truck|
           food_truck.inventory.keys.each do |item|
-            # require "pry"; binding.pry
             if item_provided == item
             total += food_truck.inventory[item]
           end
@@ -50,24 +49,36 @@ class Event
       total
   end
 
-  def total_inventory
-  total_items = {}
-  hash = {}
-  @food_trucks.each do |food_truck|
-        food_truck.inventory.keys.each do |item|
-          if hash[:food_trucks]
-            require "pry"; binding.pry
-            hash[:food_trucks] << food_trucks_that_sell(item)
-            hash[:quantity] = item_count(item)
-          else
-          hash[:quantity] = item_count(item)
-          hash[:food_trucks] = food_trucks_that_sell(item)
-        end
-          total_items[item] = hash
-
-        end
-      end
-        total_items
+  def second_hash(item)
+    second_hash = {}
+    @food_trucks.each do |food_truck|
+      second_hash[:quantity] = item_count(item)
+      second_hash[:food_trucks] = food_trucks_that_sell(item)
+    end
+    second_hash
   end
 
+  def total_inventory
+    first_hash = {}
+    @food_trucks.each do |food_truck|
+      food_truck.inventory.keys.each do |item|
+        first_hash[item] = second_hash(item)
+      end
+    end
+    first_hash
+  end
+
+  def overstocked_items
+    # An item is overstocked if it is sold by more than 1
+    # food truck AND the total quantity is greater than 50.
+    item_array = []
+    @food_trucks.each do |food_truck|
+      food_truck.inventory.keys.each do |item|
+        if food_trucks_that_sell(item).length >= 2 && item_count(item) > 50
+          item_array << item
+        end
+      end
+    end
+    item_array.uniq
+  end
 end
