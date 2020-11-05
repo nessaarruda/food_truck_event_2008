@@ -1,84 +1,96 @@
 class Event
-  attr_reader :name, :food_trucks
+  attr_reader :name,
+              :food_trucks,
+              :date
 
   def initialize(name)
     @name = name
     @food_trucks = []
+    @date = Date.today
   end
 
   def add_food_truck(food_truck)
-    @food_trucks << food_truck
+    @food_trucks << food_truck if !@food_trucks.include?(food_truck)
   end
 
   def food_truck_names
     @food_trucks.map do |food_truck|
-      food_truck.name
-    end
+        food_truck.name
+      end
   end
 
-  def food_trucks_that_sell(item_provided)
-    food_trucks_that_sell = []
-    @food_trucks.each do |food_truck|
-          if food_truck.inventory.include?(item_provided)
-            food_trucks_that_sell << food_truck
-          end
-        end
-          food_trucks_that_sell
-
+  def food_trucks_that_sell(item)
+    @food_trucks.map do |food_truck|
+      if food_truck.inventory.include?(item)
+        food_truck
+      end
+    end.compact!
   end
 
   def sorted_item_list
-    array = []
+    sorted = []
     @food_trucks.each do |food_truck|
-          food_truck.inventory.keys.each do |item|
-          array << item.name
-        end
+      food_truck.inventory.keys.each do |item|
+        sorted << item.name
       end
-      array.sort.uniq
+    end
+    sorted.uniq.sort!
   end
 
-  def item_count(item_provided)
+  def total_items(item_provided)
     total = 0
     @food_trucks.each do |food_truck|
-          food_truck.inventory.keys.each do |item|
-            if item_provided == item
-            total += food_truck.inventory[item]
-          end
+      food_truck.inventory.each_pair do |item, quantity|
+        if item_provided == item
+          total += quantity
         end
       end
-      total
-  end
-
-  def second_hash(item)
-    second_hash = {}
-    @food_trucks.each do |food_truck|
-      second_hash[:quantity] = item_count(item)
-      second_hash[:food_trucks] = food_trucks_that_sell(item)
     end
-    second_hash
+    total
   end
 
   def total_inventory
-    first_hash = {}
+    final_result = {}
     @food_trucks.each do |food_truck|
       food_truck.inventory.keys.each do |item|
-        first_hash[item] = second_hash(item)
+      second_hash = {}
+      second_hash[:food_trucks] = food_trucks_that_sell(item)
+      second_hash[:quantity] = total_items(item)
+      final_result[item] = second_hash
       end
     end
-    first_hash
+      final_result
   end
 
   def overstocked_items
-    # An item is overstocked if it is sold by more than 1
-    # food truck AND the total quantity is greater than 50.
-    item_array = []
+    overstocked = []
     @food_trucks.each do |food_truck|
       food_truck.inventory.keys.each do |item|
-        if food_trucks_that_sell(item).length >= 2 && item_count(item) > 50
-          item_array << item
+        if food_trucks_that_sell(item).count >= 2 && total_items(item) > 50
+          overstocked << item
         end
       end
     end
-    item_array.uniq
+    overstocked.uniq
+  end
+
+  def is_enough?(item, quantity_provided)
+    quantity = total_items(item)
+    quantity >= quantity_provided
+  end
+
+  def sell(item, quantity_provided)
+    if !is_enough?(item, quantity_provided)
+      false
+    else
+      quantity = quantity_provided
+      @food_trucks.each do |food_truck|
+        while food_truck.inventory[item] > 0 && quantity > 0
+          food_truck.inventory[item] -= 1
+          quantity -= 1
+        end
+      end
+      true
+    end
   end
 end

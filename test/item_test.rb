@@ -1,7 +1,6 @@
 require 'minitest/autorun'
 require 'minitest/pride'
 require './lib/item'
-require './lib/food_truck'
 
 class ItemTest < Minitest::Test
 
@@ -11,7 +10,8 @@ class ItemTest < Minitest::Test
   end
 
   def test_it_exists_and_has_attributes
+    assert_instance_of Item, @item1
     assert_equal "Apple Pie (Slice)", @item2.name
-    assert_equal 2.50, @item2.price
+    assert_equal 2.5, @item2.price
   end
 end
